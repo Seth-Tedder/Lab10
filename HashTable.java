@@ -8,7 +8,7 @@ package lab10;
 public class HashTable<E> {
 	private HashEntry[] table = new HashEntry[500];
 	
-	private class HashEntry<E, F> {
+	private class HashEntry<F> {
 		public F key;
 		public E value;
 		public HashEntry(F key, E value) {
@@ -19,21 +19,39 @@ public class HashTable<E> {
 			return key + "=" + value.toString();
 		}
 	}
-	
-	public HashTable(E item) {
+	/**
+	 * Default constructor
+	 */
+	public HashTable() {
 		
 	}
-	public boolean add() {
+	/**
+	 * Adds an item to the table.  Returns true if successful, and false otherwise
+	 * @param item
+	 * @return
+	 */
+	public boolean add(E item) {
 		return false;
 	}
-	public E find() {
+	/**
+	 * Finds an item in the table.  Returns the item if successful, and null otherwise.
+	 * @param item
+	 * @return
+	 */
+	public E find(E item) {
 		return null;
 	}
+	/**
+	 * Helper method used to resize the table when limit is reached.
+	 */
 	private void resize() {
 		HashEntry[] newTable = new HashEntry[table.length * 2];
 		for (int i = 0; i < table.length; i++) {
 			newTable[i] = table[i];
 		}
 		table = newTable;
+	}
+	public static void main(String[] args) {
+		
 	}
 }
