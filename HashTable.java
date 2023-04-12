@@ -11,7 +11,7 @@ public class HashTable<E> {
 	private class HashEntry<E, F> {
 		public F key;
 		public E value;
-		public HashEntry(int key, E value) {
+		public HashEntry(F key, E value) {
 			this.key = key;
 			this.value = value;
 		}
