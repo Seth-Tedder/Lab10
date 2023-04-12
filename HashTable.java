@@ -17,4 +17,7 @@ public class HashTable<E> {
 	public E find() {
 		return null;
 	}
+	private void resize() {
+		
+	}
 }
