@@ -1,0 +1,85 @@
+/**
+ * HashTable class
+ * 
+ * @author Seth, Kyrin, Abbas
+ * @version
+ */
+public class HashTable<E> {
+	private HashEntry[] table = new HashEntry[500];
+	private int size = 0;
+	private int loadFactor = 75;
+	private int count = 0;
+
+	private class HashEntry<E, F> {
+		public F key;
+		public E value;
+
+		public HashEntry(F key, E value) {
+			this.key = key;
+			this.value = value;
+		}
+
+		public String toString() {
+			return key + "=" + value.toString();
+		}
+	}
+
+	public HashTable(E item) {
+
+	}
+
+
+	/**
+	 * Abbas - 
+	 * Adds an item to the table. Returns true if successful, and false otherwise
+	 * 
+	 * @param item the object you want to add
+	 * @return
+	 */
+	public boolean add(E item) {
+		if (count * 100 / table.length > loadFactor) {
+			resize();
+		}
+		int hashValue = getHashValue(item.hashCode());
+		while (table[hashValue] != null && !table[hashValue].value.equals(item)) {
+			hashValue = (hashValue + getSecondHashValue(item.hashCode())) % table.length;
+		}
+		if (table[hashValue] == null) {
+			table[hashValue] = new HashEntry(item.hashCode(), item);
+			count++;
+			size++;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Abbas - 
+	 * Double hashing function to calculate hash value.
+	 * 
+	 * @param id the key value of the object
+	 * @return the double hashvalue of the object
+	 */
+	private int getHashValue(int id) {
+		int hash1 = id % table.length;
+		int hash2 = getSecondHashValue(id);
+		int hashValue = hash1;
+
+		while (table[hashValue] != null && table[hashValue].key != id) {
+			hashValue = (hashValue + hash2) % table.length;
+		}
+
+		return hashValue;
+	}
+
+	/**
+	 * Abbas - 
+	 * Secondary hash function used for double hashing.
+	 * 
+	 * @param id the object's key value
+	 * @return the secondary hash value 
+	 */
+	private int getSecondHashValue(int id) {
+		return (id % (table.length - 2)) + 1;
+	}
