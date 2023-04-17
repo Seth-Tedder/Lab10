@@ -39,7 +39,19 @@ public class HashTable<E> {
 	 * @return
 	 */
 	public E find(E item) {
-		return null;
+	    if (item == null) {
+	        return null;
+	    }
+
+	    int hashValue = getHashValue(item.hashCode());
+	    while (table[hashValue] != null) {
+	        if (table[hashValue].value.equals(item)) {
+	            return table[hashValue].value;
+	        }
+	        hashValue = (hashValue + getSecondHashValue(item.hashCode())) % table.length;
+	    }
+	    
+	    return null;
 	}
 	/**
 	 * Helper method used to resize the table when limit is reached.
