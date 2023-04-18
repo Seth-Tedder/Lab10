@@ -71,13 +71,20 @@ public class HashTable<E> {
 	 * @return
 	 */
 	public E find(E item) {
-	    public E find(E item) {
-	        int hashValue = getHashValue(item.hashCode());
-	        if (table[hashValue] != null && table[hashValue].value.equals(item)) {
-	            return table[hashValue].value;
-	        }
-	        return null;
-	    }
+        Integer key = item.hashCode();
+        if (key == null || key == -1) {
+            return null;
+        }
+        int index = key.toString().charAt(0) % table.length;
+        int step = key.toString().charAt(1) % (table.length - 2) + 1;
+
+        while (table[index] != null) {
+            if (table[index].key == key) {
+                return table[index].value;
+            }
+            index = (index + step) % table.length;
+        }
+        return null;
 	}
 	/**
 	 * Helper method used to resize the table when limit is reached.
