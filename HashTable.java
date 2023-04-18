@@ -9,7 +9,7 @@ import java.io.*;
 public class HashTable<E> {
 	private HashEntry[] table = new HashEntry[500];
 	private int size = 0;
-	private int loadFactor = 75;
+	private double LOAD_FACTOR = .75;
 	private int count = 0;
 	
 	private class HashEntry<E> {
@@ -34,57 +34,35 @@ public class HashTable<E> {
 	}
 	/**
 	 * Abbas - 
-	 * Adds an item to the table. Returns true if successful, and false otherwise
+	 * Adds an item to the table, resizes if it has to
 	 * 
 	 * @param item the object you want to add
-	 * @return
+	 * @return true 
 	 */
 	public boolean add(E item) {
-		if (count * 100 / table.length > loadFactor) {
-			resize();
-		}
-		int hashValue = getHashValue(item.hashCode());
-		while (table[hashValue] != null && !table[hashValue].value.equals(item)) {
-			hashValue = (hashValue + getSecondHashValue(item.hashCode())) % table.length;
-		}
-		if (table[hashValue] == null) {
-			table[hashValue] = new HashEntry(item.hashCode(), item);
-			count++;
-			size++;
-			return true;
-		} else {
-			return false;
-		}
-	}
+		Integer key = item.hashCode();
+		if (key == null) {
+		       throw new IllegalArgumentException("Key cannot be null");
+		    }
+		int index = key.toString().charAt(0) % table.length;
+		int step = key.toString().charAt(1) % (table.length - 2) + 1;
 
-	/**
-	 * Abbas - 
-	 * Double hashing function to calculate hash value.
-	 * 
-	 * @param id the key value of the object
-	 * @return the double hashvalue of the object
-	 */
-	private int getHashValue(int id) {
-		int hash1 = id % table.length;
-		int hash2 = getSecondHashValue(id);
-		int hashValue = hash1;
+		while (table[index] != null && !(table[index].key==(key))) {
+		      index = (index + step) % table.length;
+		    }
 
-		while (table[hashValue] != null && table[hashValue].key != id) {
-			hashValue = (hashValue + hash2) % table.length;
-		}
-
-		return hashValue;
-	}
-
-	/**
-	 * Abbas - 
-	 * Secondary hash function used for double hashing.
-	 * 
-	 * @param id the object's key value
-	 * @return the secondary hash value 
-	 */
-	private int getSecondHashValue(int id) {
-		return (id % (table.length - 2)) + 1;
+		if (table[index] == null) {
+		        table[index] = new HashEntry<>(key, item);
+		        size++;
+		        double loadFactor = (double) size / table.length;
+		        if (loadFactor > LOAD_FACTOR) {
+		            resize();
+		        }
+		    } 
+			else {
+		        table[index].value = item;
+		    }
+		    return true;
 	}
 	/**
 	 * Kyrin
