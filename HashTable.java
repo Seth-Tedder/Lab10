@@ -93,19 +93,13 @@ public class HashTable<E> {
 	 * @return
 	 */
 	public E find(E item) {
-	    if (item == null) {
+	    public E find(E item) {
+	        int hashValue = getHashValue(item.hashCode());
+	        if (table[hashValue] != null && table[hashValue].value.equals(item)) {
+	            return table[hashValue].value;
+	        }
 	        return null;
 	    }
-
-	    int hashValue = getHashValue(item.hashCode());
-	    while (table[hashValue] != null) {
-	        if (table[hashValue].value.equals(item)) {
-	            return (E)table[hashValue].value;
-	        }
-	        hashValue = (hashValue + getSecondHashValue(item.hashCode())) % table.length;
-	    }
-	    
-	    return null;
 	}
 	/**
 	 * Helper method used to resize the table when limit is reached.
