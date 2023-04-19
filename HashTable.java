@@ -80,7 +80,7 @@ public class HashTable<E> {
 
         while (table[index] != null) {
             if (table[index].key == key) {
-                return table[index].value;
+                return (E)table[index].value;
             }
             index = (index + step) % table.length;
         }
@@ -98,12 +98,16 @@ public class HashTable<E> {
 	}
 	public static void main(String[] args) {
 		ArrayList<Student> studentList = new ArrayList<Student>();
+		ArrayList<Student> findList = new ArrayList<Student>();
 		try {
 			File file = new File("StudentsNames.txt");
 			Scanner scnr = new Scanner(file);
 			while(scnr.hasNext()) {
-				Student s = new Student(scnr.next());
+				String name = scnr.next();
+				Student s = new Student(name);
 				studentList.add(s);
+				Student s1 = new Student(name);
+				findList.add(s1);
 			}
 		} catch (Exception e){
 			System.out.println("File not found");
@@ -111,6 +115,9 @@ public class HashTable<E> {
 		HashTable<Student> studentHash = new HashTable<Student>();
 		for (Student s : studentList) {
 			studentHash.add(s);
+		}
+		for (Student st : findList) {
+			System.out.println(studentHash.find(st));
 		}
 	}
 	/**
