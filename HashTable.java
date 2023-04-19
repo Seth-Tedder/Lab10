@@ -34,35 +34,48 @@ public class HashTable<E> {
 	}
 	/**
 	 * Abbas - 
-	 * Adds an item to the table, resizes if it has to
+	 * Adds an item to the table. If the key already exists, updates the existing
+	 * value. Returns true if the item was added or updated, false otherwise.
 	 * 
-	 * @param item the object you want to add
-	 * @return true 
+	 * @param item the object you want to add or update
+	 * @return true if the item was added or updated, false otherwise
 	 */
 	public boolean add(E item) {
+		// Get the key for the item
 		Integer key = item.hashCode();
 		if (key == null) {
-		       throw new IllegalArgumentException("Key cannot be null");
-		    }
+			throw new IllegalArgumentException("Key cannot be null");
+		}
+
+		// Calculate the initial index and step
 		int index = key.toString().charAt(0) % table.length;
 		int step = key.toString().charAt(1) % (table.length - 2) + 1;
 
-		while (table[index] != null && !(table[index].key==(key))) {
-		      index = (index + step) % table.length;
-		    }
+		// Try to find an empty slot or a matching key
+		boolean added = false;
+		while (!added && table[index] != null) {
+			if (table[index].key == key) {
+				// Key already exists, update the value
+				table[index].value = item;
+				added = true;
+			} else {
+				// Keep looking with the next step
+				index = (index + step) % table.length;
+			}
+		}
 
-		if (table[index] == null) {
-		        table[index] = new HashEntry<>(key, item);
-		        size++;
-		        double loadFactor = (double) size / table.length;
-		        if (loadFactor > LOAD_FACTOR) {
-		            resize();
-		        }
-		    } 
-			else {
-		        table[index].value = item;
-		    }
-		    return true;
+		// Add the item if an empty slot was found
+		if (!added) {
+			table[index] = new HashEntry<>(key, item);
+			size++;
+			double loadFactor = (double) size / table.length;
+			if (loadFactor > LOAD_FACTOR) {
+				resize();
+			}
+			added = true;
+		}
+
+		return added;
 	}
 	/**
 	 * Kyrin
