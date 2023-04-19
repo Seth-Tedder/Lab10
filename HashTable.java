@@ -84,20 +84,27 @@ public class HashTable<E> {
 	 * @return
 	 */
 	public E find(E item) {
-        Integer key = item.hashCode();
-        if (key == null || key == -1) {
-            return null;
-        }
-        int index = key.toString().charAt(0) % table.length;
-        int step = key.toString().charAt(1) % (table.length - 2) + 1;
+	    Integer key = item.hashCode();
+	    if (key == null) {
+	        throw new IllegalArgumentException("Key cannot be null");
+	    }
 
-        while (table[index] != null) {
-            if (table[index].key == key) {
-                return (E)table[index].value;
-            }
-            index = (index + step) % table.length;
-        }
-        return null;
+	    int index = key.toString().charAt(0) % table.length;
+	    int step = key.toString().charAt(1) % (table.length - 2) + 1;
+	    int initialIndex = index;
+
+	    while (table[index] != null) {
+	        if (table[index].key == key) {
+	            return table[index].value;
+	        } else {
+	            index = (index + step) % table.length;
+	            if (index == initialIndex) {
+	                break; // We have traversed the entire table without finding the key
+	            }
+	        }
+	    }
+	    return null;
+
 	}
 	/**
 	 * Helper method used to resize the table when limit is reached.
