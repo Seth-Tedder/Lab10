@@ -1,0 +1,241 @@
+Seth: Data structure and resize method
+Abbas: Add method
+Kyrin: Find method
+
+Code outputs correct names in correct order.  It's worth noting that while all students are iterated through for the find method, they are not all displayed.  
+The console will only display from '12913: Machael' and on.  
+
+I've run the code twenty times and calculated an average.
+196 milliseconds
+163 milliseconds
+164 milliseconds
+163 milliseconds
+171 milliseconds
+162 milliseconds
+177 milliseconds
+168 milliseconds
+166 milliseconds
+164 milliseconds
+179 milliseconds
+159 milliseconds
+161 milliseconds
+177 milliseconds
+166 milliseconds
+179 milliseconds
+195 milliseconds
+158 milliseconds
+172 milliseconds
+177 milliseconds
+168 milliseconds
+
+Average for all students: 179.25 milliseconds
+Average per student: 0.009828 milliseconds
+
+HashTable.java
+package lab10;
+import java.util.*;
+import java.io.*;
+/**
+ * HashTable class
+ * @author Seth, Kyrin, Abbas
+ * @version 4/19/2023
+ */
+public class HashTable<E> {
+	private HashEntry[] table = new HashEntry[500];
+	private int size = 0;
+	private double LOAD_FACTOR = .75;
+	private int count = 0;
+	//testing
+	private int iteration = 0;
+	
+	private class HashEntry<E> {
+		public int key;
+		public E value;
+		public HashEntry(int key, E value) {
+			this.key = key;
+			this.value = value;
+		}
+		public String toString() {
+			return key + "=" + value.toString();
+		}
+	}
+	/**
+	 * Default constructor
+	 */
+	public HashTable(E item) {
+		this.add(item);
+	}
+	public HashTable() {
+		
+	}
+	/**
+	 * Abbas - 
+	 * Adds an item to the table. If the key already exists, updates the existing
+	 * value. Returns true if the item was added or updated, false otherwise.
+	 * 
+	 * Alterations made by Seth Tedder (marked in line)
+	 * 
+	 * @param item the object you want to add or update
+	 * @return true if the item was added or updated, false otherwise
+	 */
+	public boolean add(E item) {
+		// Get the key for the item
+		Integer key = item.hashCode();
+		if (key == null) {
+			throw new IllegalArgumentException("Key cannot be null");
+		}
+
+		// Calculate the initial index and step
+		int index = item.toString().charAt(0) % table.length;
+		int step = item.toString().charAt(1) % (table.length - 2) + 1;
+		
+		//Checks if resizing needs to occur.  Written by Abbas, moved by Seth
+		double loadFactor = (double) size / table.length;
+		if (loadFactor > LOAD_FACTOR) {
+			resize();
+		}
+		
+		// Try to find an empty slot or a matching key
+		boolean added = false;
+		while (table[index] != null) {
+//			if (table[index].key == key) {
+//				// Key already exists, update the value
+//				table[index].value = item;
+//				added = true;
+//			} else {
+				 //Keep looking with the next step
+			//Checks to make sure out of bounds won't be reached.
+			if (index + step >= table.length) {
+				index = step - (table.length - index);
+			}
+				//Removed modulo - Seth
+				index = (index + step) % table.length;
+//			}
+		}
+
+		// Add the item if an empty slot was found
+		if (!added) {
+			table[index] = new HashEntry<>(key, item);
+			size++;
+			added = true;
+		}
+
+		return added;
+	}
+	/**
+	 * Kyrin
+	 * Finds an item in the table.  Returns the item if successful, and null otherwise.
+	 * @param item
+	 * @return
+	 */
+	public E find(E item) {
+	    Integer key = item.hashCode();
+	    if (key == null) {
+	        throw new IllegalArgumentException("Key cannot be null");
+	    }
+	    //Altered key.toString to item.toString	
+	    int index = item.toString().charAt(0) % table.length;
+	    int step = item.toString().charAt(1) % (table.length - 2) + 1;
+	    int initialIndex = index;
+
+	    while (table[index] != null) {
+	    	//Changed condition to check value as well. (Seth Tedder)
+	        if (table[index].key == key && (table[index].value.equals(item) || table[index].value.toString().equals(item.toString()))) {
+	            return (E)table[index].value;
+	        } else {
+	            index = (index + step) % table.length;
+	            if (index == initialIndex) {
+	                break; // We have traversed the entire table without finding the key
+	            }
+	        }
+	    }
+	    return null;
+
+	}
+	/**
+	 * Seth Tedder
+	 * Helper method used to resize the table when limit is reached.
+	 */
+	private void resize() {
+		HashEntry[] newTable = new HashEntry[table.length * 2];
+		for (int i = 0; i < table.length; i++) {
+			newTable[i] = table[i];
+		}
+		table = newTable;
+	}
+	/**
+	 * Main method used for testing.  Seth Tedder
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		ArrayList<Student> studentList = new ArrayList<Student>();
+		ArrayList<Student> findList = new ArrayList<Student>();
+		try {
+			File file = new File("StudentsNames.txt");
+			Scanner scnr = new Scanner(file);
+			while(scnr.hasNext()) {
+				String name = scnr.next();
+				Student s = new Student(name);
+				studentList.add(s);
+				Student s1 = new Student(name);
+				findList.add(s1);
+			}
+		} catch (Exception e){
+			System.out.println("File not found");
+		}
+		HashTable<Student> studentHash = new HashTable<Student>();
+		for (Student s : studentList) {
+			studentHash.add(s);
+		}
+		int count = 0;
+		
+		long time1 = System.currentTimeMillis();
+		for (Student st : findList) {
+			count++;
+			System.out.println(count + ":  " + studentHash.find(st));
+		}
+		long time2 = System.currentTimeMillis();
+		System.out.println((time2 - time1) + " milliseconds");
+		
+		Student Dominika = new Student("Dominika");
+		System.out.println("Dominika: " + studentHash.find(Dominika));
+		//Used for testing hashCode() method in Student class
+		Student test1 = new Student("Michael");
+		Student test2 = new Student("Jessica");
+		Student test3 = new Student("Rachael");
+		System.out.println("Michael " + test1.hashCode() + "    Jessica " + test2.hashCode() + "    Rachael " + test3.hashCode());
+	}
+	/**
+	 * Student class used for testing
+	 * @author Seth Tedder
+	 * @version 4/18/2023
+	 */
+	public static class Student {
+		private String name;
+		private int hashValue = -1;
+		
+		public Student(String name) {
+			this.name = name;
+		}
+		public String toString() {
+			return this.name;
+		}
+		/**
+		 * Original code written by Abbas.  Changes made by Seth Tedder.
+		 */
+		@Override
+		public int hashCode() {
+			if (name == null || hashValue != -1) {
+				return -1;
+			}
+			int hash1 = name.charAt(0);
+			int hash2 = 0;
+			if (name.length() > 1) {
+				hash2 = name.charAt(1);
+			}
+			hashValue = hash1 + hash2;
+			
+			return hashValue;
+		}
+	}
+}
